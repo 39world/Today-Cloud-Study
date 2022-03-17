@@ -4,7 +4,7 @@
 
 1.  프로젝트 개요  
     1.1 목표  
-    1.2 팀원  
+    1.2 주제 선정 이유  
     1.3 진행 기간  
     1.4 인프라 구축 환경  
     1.5 서버 구성
@@ -17,40 +17,43 @@
     2.6 SSL을 이용한 HTTPS 적용
 3.  진행 과정에서 생긴 에러 해결 목록
 
-## 프로젝트 개요
+## 1. 프로젝트 개요
 
-### 목표
+### 1.1 목표
 
 리눅스 인프라 구축을 통한 WordPress 구현
 
-### 팀원
+### 1.2 주제 선정 이유
 
--   강상구
+클라우드 수업을 들으며 공부한 네트워크 관련 CS 지식과 리눅스 시스템 지식들을 정리하고 내 것으로 만들고 싶었습니다. 리눅스 기초의 핵심이라 생각되는 서비스 관리, 소프트 웨어 관리, 네트워크 설정, 방화벽, DNS, 가상 호스트와 Apache 등을 모두 사용하여 인프라를 구축하고자 했습니다.
+하나의 서버에서 Wordpress와 DB를 사용하는 것이 아니라 웹 서버와 DB 서버, DNS 서버를 나눠서 구축하여 실제 서비스와 비슷한 환경을 구성하고자 노력했습니다.  
 
-### 진행 기간
+### 1.3 진행 기간
 
 -   2022.03.15(화) ~ 2022.03.18(금)
 
-### 인프라 구축 환경
+### 1.4 인프라 구축 환경
 
 -   CentOS 7 + Virtual Box
 -   Wordpress
--   Apache
--   PHP
--   MariaDB
--   named
+-   Apache (웹 서버)
+-   PHP (동적 컨텐츠 이용)
+-   MariaDB (DataBase)
+-   named (DNS)
 
-### 서버 구성
+### 1.5 서버 구성
+
+![](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Flxia7%2Fbtrv9Ry7unf%2FSwsgkPaSKoNohdnvat6WB0%2Fimg.png)  
 
 -   웹 서버 (Apache + PHP + Wordpress)
 -   DNS 서버 (MariaDB)
 -   DB 서버 (named)
 
-## 구성 과정
+## 2. 구성 과정
 
-### 1\. 웹 서버 구축
+### 2.1. 웹 서버 구축
 
-#### 1.1) 네트워크 초기 설정
+#### 2.1.1. 네트워크 초기 설정
 
 클라이언트를 담당할 서버의 네트워크 초기 설정을 진행한다.  
 enp0s8을 사용하며, 네트워크를 설정해준다.
@@ -70,7 +73,7 @@ hostnamectl set-hostname wordpress.miniproejct
 yum -y update
 ```
 
-#### 1.2) 웹 서버 설치
+#### 2.1.2. 웹 서버 설치
 
 httpd를 설치하고 방화벽 정책을 추가해준다.
 
@@ -93,7 +96,7 @@ httpd-2.4.6-97.el7.centos.4.x86_64
 success
 ```
 
-#### 1-3) PHP 7.4 이상 설치
+#### 2.1.3. PHP 7.4 이상 설치
 
 yum으로 설치하면 5.4 버전이 설치됨. remi와 yum-utils로 버전 변경
 
@@ -116,7 +119,7 @@ php74-php-pecl-igbinary-devel php74-php-pecl-geoip \
 php74-php-pecl-xdebug php74-php-pecl-mysqlnd-azure
 ```
 
-#### 1-4) 웹 데몬 재시작
+#### 2.1.4. 웹 데몬 재시작
 
 PHP74는 웹 데몬에서 라이브러리처럼 동작한다.  
 따라서 PHP를 설치한 후 웹 데몬을 재시작해준다.
@@ -126,7 +129,7 @@ PHP74는 웹 데몬에서 라이브러리처럼 동작한다.
 # systemctl status httpd.service
 ```
 
-#### 1-5) 워드 프레스 다운 받기
+#### 2.1.5. 워드 프레스 다운 받기
 
 참고 사이트 [https://wordpress.org/support/article/how-to-install-wordpress/](https://wordpress.org/support/article/how-to-install-wordpress/)  
 워드 프레스는 URL로 바로 받기 위해 wget 패키지를 사용했다.
@@ -142,9 +145,9 @@ PHP74는 웹 데몬에서 라이브러리처럼 동작한다.
 #게시판을 그림파일 올릴때 사용할 디렉토리를 생성한다 위에서 지정한 경로를 꼭 확인해야한다. 그아래 uploads 디렉토리를 생성해야함.
 ```
 
-### 2\. DB 서버 구축
+### 2.2. DB 서버 구축
 
-#### 2-1) MariaDB 설치
+#### 2.2.1. MariaDB 설치
 
 워드 프레스 설치를 위해 MariaDB 10.2 버전 이상이 필요하기때문에 mariaDB 사이트([https://mariadb.org/download/?t=repo-config)에서](https://mariadb.org/download/?t=repo-config)%EC%97%90%EC%84%9C) Centos7(x86\_64) 와 10.2 버전을 선택 후 repository를 확인한다.  
 그 후 그 내용을 /etc/yum.repos.d/MariaDB.repo 파일로 저장한다.
@@ -175,7 +178,7 @@ gpgcheck=1
 # rpm -ql MariaDB  실행파일, 데몬명 확인  (mysql 클라이언트 접속 명령어)
 ```
 
-#### 2-2) MariaDB 초기 설정
+#### 2.2.2. MariaDB 초기 설정
 
 systemctl을 사용해 설치된 mariadb를 활성화 시켜주고 /mysql\_secure\_installation을 통해 보안 설정과 MariaDB의 초기 설정을 만져준다.
 
@@ -250,7 +253,7 @@ installation should now be secure.
 Thanks for using MariaDB!
 ```
 
-#### 2-3) MariaDB 포트 설정
+#### 2.2.3. MariaDB 포트 설정
 
 웹 서버와 DB 서버를 따로 구축하기 때문에 방화벽에서 포트를 열어줘야한다.
 
@@ -275,7 +278,7 @@ public (active)
   rich rules:
 ```
 
-#### 2-4) wordpress에서 사용할 DB 생성
+#### 2.2.4. wordpress에서 사용할 DB 생성
 
 만들어진 MariaDB에 wordpress에서 사용할 DB를 생성한 뒤 사용자를 만들고 사용자에게 게시판 사용 권한을 부여한다.
 
@@ -315,7 +318,7 @@ rpm -qa httpd
 또는 httpd -v
 ```
 
-### 3\. 워드 프레스 초기 설정
+### 2.3. 워드 프레스 초기 설정
 
 위에서 설치한 웹 서버의 워드 프레스에 DB 서버를 연결할 수 있도록 설정해준다.
 
@@ -337,7 +340,7 @@ define( 'DB_PASSWORD', 'dkagh1' ); 위 사용자의 암호 설정
 define( 'DB_HOST', '192.168.56.150' ); DB 서버를 별도로 운영하기위해 DB 서버의 IP주소 설정
 ```
 
-### 4\. 워드 프레스 실행
+### 2.4. 워드 프레스 실행
 
 설정을 완료하고 클라이언트 브라우저 (웹 서버 브라우저)에서 [http://ip주소(클라이언트)/wordpress/](http://ip%EC%A3%BC%EC%86%8C(%ED%81%B4%EB%9D%BC%EC%9D%B4%EC%96%B8%ED%8A%B8)/wordpress/) 로 접근하면 환경 설정 마법사가 시작된다.  
 언어, 사이트 이름, 관리자, email, 사용자 계정을 추가하고 로그인하면 게시판 사용이 가능해진다.
@@ -397,15 +400,15 @@ MariaDB [wordpress]> SELECT * FROM wp_users;
 1 row in set (0.00 sec)
 ```
 
-### 5\. DNS 서버 구축
+### 2.5. DNS 서버 구축
 
-#### 5-1) 패키지 설치
+#### 2.5.1 패키지 설치
 
 ```
 yum -y install bind bind-utils
 ```
 
-#### 5-2) 서비스 설정
+#### 2.5.2. 서비스 설정
 
 고정 아이피 설정 및 DNS 서버 주소, hostname 설정
 
@@ -466,7 +469,7 @@ client  A       192.168.56.101
 [root@dns named]# chown :named dnsserver.miniproject.com.zone
 ```
 
-#### 5-3) 서비스 활성화 및 방화벽 설정
+#### 2.5.3. 서비스 활성화 및 방화벽 설정
 
 ```
 [root@dns named]# systemctl start named
@@ -478,14 +481,14 @@ success
 success
 ```
 
-#### 5-4) 확인
+#### 2.5.4. 확인
 
 ```
 [root@dns named]# host dns.dnsserver.miniproject.com
 dns.dnsserver.miniproject.com has address 10.0.2.10
 ```
 
-#### 5-5) 웹 서버 및 DB 서버의 DNS 주소 설정
+#### 2.5.5. 웹 서버 및 DB 서버의 DNS 주소 설정
 
 dns 주소를 네트워크에 설정해주기
 
@@ -540,9 +543,9 @@ public (active)
 
 ![](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FPW26d%2Fbtrv6YEt35f%2FLhucs7esrcOLJejg2SAPI1%2Fimg.png)
 
-### 6.SSL을 이용한 https 적용해보기
+### 2.6. SSL을 이용한 https 적용해보기
 
-#### 6-1) 웹 서버에 SSL 모듈 설치
+#### 2.6.1. 웹 서버에 SSL 모듈 설치
 
 ```
 [root@wordpress ~]# yum install -y mod_ssl
@@ -551,7 +554,7 @@ public (active)
 \*\*\*이때 내가 만든 DNS 서버가 유일하게 작동하고 있기 때문에 yum으로 네트워크에서 파일을 받아 올 수 없다.  
 enp0s3으로 만들어둔 static 네트워크를 내리고 client01의 ipv4.dns를 공개적으로 사용되는 ip로 바꿔준 후에 실행하고 다시 설정 값을 되돌려준다.
 
-### 6-2) 방화벽 설정
+### 2.6.2. 방화벽 설정
 
 현재 httpd를 이미 활성화 시켰기 때문에 httpd를 활성화하는 과정을 건너뛰고 방화벽에 https를 추가해준다.
 
@@ -576,7 +579,7 @@ public (active)
   rich rules:
 ```
 
-#### 6-3) 개인 키 생성
+#### 2.6.3. 개인 키 생성
 
 키를 생성할 위치로 이동한다 (고정되어 있다)
 
@@ -597,7 +600,7 @@ e is 65537 (0x10001)
 키 비트수 = 2048
 ```
 
-#### 6-4) 인증서(CSR) 만들기
+#### 2.6.4. 인증서(CSR) 만들기
 
 ```
 [root@wordpress certs]# openssl req -new -key minipj.key -out minipj.csr
@@ -622,7 +625,7 @@ A challenge password []:
 An optional company name []:
 ```
 
-#### 6-5) 키와 인증서 합치기
+#### 2.6.5. 키와 인증서 합치기
 
 ```
 [root@wordpress certs]# openssl x509 -req -signkey minipj.key -in minipj.csr -out minipj.crt
@@ -631,7 +634,7 @@ subject=/C=kr/ST=seoul/L=seocho/O=encore/OU=cloudclass/CN=client.miniproject.com
 Getting Private key
 ```
 
-#### 6-6) 키와 crt의 권한을 제한하고 키를 지정된 경로로 이동시키기
+#### 2.6.6. 키와 crt의 권한을 제한하고 키를 지정된 경로로 이동시키기
 
 ```
 [root@wordpress certs]# chmod 600 minipj.key minipj.crt
@@ -642,7 +645,7 @@ Getting Private key
 [root@wordpress certs]# mv minipj.key /etc/pki/tls/private
 ```
 
-#### 6-7) SSL 파일 설정
+#### 2.6.7. SSL 파일 설정
 
 vi /etc/httpd/conf.d/ssl.conf 파일을 설정해준다.  
 그리고 httpd를 재시작해준다.
@@ -664,11 +667,11 @@ vi /etc/httpd/conf.d/ssl.conf 파일을 설정해준다.
 [root@wordpress certs]# systemctl restart httpd
 ```
 
-#### 6-8) 확인
+#### 2.6.8. 확인
 
 ![](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbXrzaT%2Fbtrv46o6twm%2F0N95oHHmBlkQ9xgqwvkjGk%2Fimg.png)
 
-### 진행 과정에서 생긴 에러 해결 목록
+### 3. 진행 과정에서 생긴 에러 해결 목록
 
 -   DB 서버로의 접근이 막혔을 때 생긴 에러
     -   ['Error establishing a database connection' 에러 해결](https://lewis-kku.tistory.com/76)
