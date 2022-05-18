@@ -80,7 +80,8 @@ kubectl expose
 - 명령형 오브젝트 구성 : yaml 파일을 순서대로 하나씩 실행
 ```
 kubectl create -f a.yaml
-kubectl run -f a.yaml
+kubectl replace -f a.yaml
+kubectl delete -f a.yaml
 kubectl expose -f a.yaml
 ```
 - 선언형 오브젝트 구성 : yaml 파일의 모음을 한번에 실행
